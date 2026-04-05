@@ -1,12 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ArticleService } from '../article/article.service';
 
 @Injectable()
 export class CategoryService {
   private categories: Category[] = [];
+
+  constructor(
+    @Inject(forwardRef(() => ArticleService))
+    private readonly articleService: ArticleService,
+  ) {}
 
   findAll(): Category[] {
     return this.categories;
@@ -42,6 +48,7 @@ export class CategoryService {
     if (index === -1) {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
+    this.articleService.nullifyCategoryId(id);
     this.categories.splice(index, 1);
   }
 }
