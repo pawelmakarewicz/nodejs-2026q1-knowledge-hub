@@ -43,7 +43,10 @@ export class CategoryController {
   @Post()
   @ApiDoc({
     summary: 'Create a new category',
-    responses: [{ status: 201, description: 'Category created' }, ...INVALID_INPUT],
+    responses: [
+      { status: 201, description: 'Category created' },
+      ...INVALID_INPUT,
+    ],
   })
   create(@Body() dto: CreateCategoryDto): Category {
     return this.categoryService.create(dto);
@@ -69,7 +72,10 @@ export class CategoryController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDoc({
     summary: 'Delete a category',
-    responses: [{ status: 204, description: 'Category deleted' }, ...UUID_ERRORS],
+    responses: [
+      { status: 204, description: 'Category deleted' },
+      ...UUID_ERRORS,
+    ],
   })
   remove(@Param('id', ParseUUIDPipe) id: string): void {
     return this.categoryService.remove(id);
