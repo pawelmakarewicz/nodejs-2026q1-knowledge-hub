@@ -78,6 +78,7 @@ export class ArticleService {
     if (dto.categoryId !== undefined) article.categoryId = dto.categoryId;
     if (dto.tags !== undefined) article.tags = dto.tags;
     article.updatedAt = Date.now();
+    console.log(`Article with id ${id} updated`);
 
     return article;
   }
