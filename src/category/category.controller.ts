@@ -27,7 +27,7 @@ export class CategoryController {
     summary: 'Get all categories',
     responses: [{ status: 200, description: 'List of all categories' }],
   })
-  findAll(): Category[] {
+  findAll(): Promise<Category[]> {
     return this.categoryService.findAll();
   }
 
@@ -36,7 +36,7 @@ export class CategoryController {
     summary: 'Get category by id',
     responses: [{ status: 200, description: 'Category found' }, ...UUID_ERRORS],
   })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Category {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Category> {
     return this.categoryService.findOne(id);
   }
 
@@ -48,7 +48,7 @@ export class CategoryController {
       ...INVALID_INPUT,
     ],
   })
-  create(@Body() dto: CreateCategoryDto): Category {
+  create(@Body() dto: CreateCategoryDto): Promise<Category> {
     return this.categoryService.create(dto);
   }
 
@@ -64,7 +64,7 @@ export class CategoryController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCategoryDto,
-  ): Category {
+  ): Promise<Category> {
     return this.categoryService.update(id, dto);
   }
 
@@ -77,7 +77,7 @@ export class CategoryController {
       ...UUID_ERRORS,
     ],
   })
-  remove(@Param('id', ParseUUIDPipe) id: string): void {
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.categoryService.remove(id);
   }
 }

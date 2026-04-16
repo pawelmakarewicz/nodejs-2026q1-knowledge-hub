@@ -6,9 +6,16 @@ import { ArticleModule } from './article/article.module';
 import { CommentModule } from './comment/comment.module';
 import { UserModule } from './user/user.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [UserModule, CategoryModule, ArticleModule, CommentModule],
+  imports: [
+    PrismaModule,
+    UserModule,
+    CategoryModule,
+    ArticleModule,
+    CommentModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
