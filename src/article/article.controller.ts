@@ -15,7 +15,7 @@ import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
-import { Article } from './entities/article.entity';
+import { Article } from '@prisma/client';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
 
 @ApiTags('Article')

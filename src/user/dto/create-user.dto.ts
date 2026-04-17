@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { UserRole } from '../../common/enums/user-role.enum';
+import { UserRole } from '@prisma/client';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'john_doe' })
@@ -13,7 +13,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 
-  @ApiPropertyOptional({ enum: UserRole, example: 'viewer' })
+  @ApiPropertyOptional({ enum: UserRole, example: 'VIEWER' })
   @IsOptional()
   @IsEnum(UserRole)
   role?: UserRole;

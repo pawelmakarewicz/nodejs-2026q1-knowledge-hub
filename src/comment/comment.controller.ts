@@ -13,7 +13,7 @@ import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
-import { Comment } from './entities/comment.entity';
+import { Comment } from '@prisma/client';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
 
 @ApiTags('Comment')

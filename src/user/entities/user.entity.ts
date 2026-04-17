@@ -1,10 +1,8 @@
-import { IUser } from '../../common/interfaces/user.interface';
-
-export class User implements IUser {
+export class User {
   id: string;
   login: string;
   password: string;
-  role: 'admin' | 'editor' | 'viewer';
-  createdAt: number;
-  updatedAt: number;
+  role: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

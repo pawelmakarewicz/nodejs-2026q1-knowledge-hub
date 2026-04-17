@@ -5,7 +5,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Article } from './entities/article.entity';
+import { Article } from '@prisma/client';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { CommentService } from '../comment/comment.service';

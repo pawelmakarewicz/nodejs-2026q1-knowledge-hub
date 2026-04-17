@@ -14,7 +14,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
-import { Category } from './entities/category.entity';
+import { Category } from '@prisma/client';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
 
 @ApiTags('Category')
