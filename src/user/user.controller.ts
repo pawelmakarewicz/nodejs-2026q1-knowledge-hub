@@ -71,7 +71,7 @@ export class UserController {
     summary: 'Delete a user',
     responses: [{ status: 204, description: 'User deleted' }, ...UUID_ERRORS],
   })
-  remove(@Param('id', ParseUUIDPipe) id: string): void {
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.userService.remove(id);
   }
 }

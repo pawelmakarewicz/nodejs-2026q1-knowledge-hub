@@ -35,7 +35,7 @@ export class ArticleController {
     @Query('status') status?: string,
     @Query('categoryId') categoryId?: string,
     @Query('tag') tag?: string,
-  ): Article[] {
+  ): Promise<Article[]> {
     return this.articleService.findAll({ status, categoryId, tag });
   }
 
@@ -44,7 +44,7 @@ export class ArticleController {
     summary: 'Get article by id',
     responses: [{ status: 200, description: 'Article found' }, ...UUID_ERRORS],
   })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Article {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Article> {
     return this.articleService.findOne(id);
   }
 
@@ -53,7 +53,7 @@ export class ArticleController {
     summary: 'Create a new article',
     responses: [{ status: 201, description: 'Article created' }, ...INVALID_INPUT],
   })
-  create(@Body() dto: CreateArticleDto): Article {
+  create(@Body() dto: CreateArticleDto): Promise<Article> {
     return this.articleService.create(dto);
   }
 
@@ -69,7 +69,7 @@ export class ArticleController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateArticleDto,
-  ): Article {
+  ): Promise<Article> {
     return this.articleService.update(id, dto);
   }
 
@@ -79,7 +79,7 @@ export class ArticleController {
     summary: 'Delete an article',
     responses: [{ status: 204, description: 'Article deleted' }, ...UUID_ERRORS],
   })
-  remove(@Param('id', ParseUUIDPipe) id: string): void {
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.articleService.remove(id);
   }
 }

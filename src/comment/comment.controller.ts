@@ -27,11 +27,11 @@ export class CommentController {
     responses: [{ status: 200, description: 'List of comments' }],
   })
   @ApiQuery({ name: 'articleId', required: false })
-  findByArticle(@Query('articleId') articleId?: string): Comment[] {
+  findByArticle(@Query('articleId') articleId?: string): Promise<Comment[]> {
     if (articleId) {
       return this.commentService.findByArticleId(articleId);
     }
-    return [];
+    return Promise.resolve([]);
   }
 
   @Get(':id')
@@ -39,7 +39,7 @@ export class CommentController {
     summary: 'Get comment by id',
     responses: [{ status: 200, description: 'Comment found' }, ...UUID_ERRORS],
   })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Comment {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Comment> {
     return this.commentService.findOne(id);
   }
 
@@ -52,7 +52,7 @@ export class CommentController {
       { status: 422, description: 'Article not found' },
     ],
   })
-  create(@Body() dto: CreateCommentDto): Comment {
+  create(@Body() dto: CreateCommentDto): Promise<Comment> {
     return this.commentService.create(dto);
   }
 
@@ -65,7 +65,7 @@ export class CommentController {
       ...UUID_ERRORS,
     ],
   })
-  remove(@Param('id', ParseUUIDPipe) id: string): void {
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.commentService.remove(id);
   }
 }
