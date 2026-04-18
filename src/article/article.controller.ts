@@ -17,6 +17,7 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
 import { Article } from '@prisma/client';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('Article')
 @Controller('article')
@@ -73,6 +74,7 @@ export class ArticleController {
     return this.articleService.update(id, dto);
   }
 
+  @Roles('admin')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDoc({

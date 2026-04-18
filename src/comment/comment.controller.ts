@@ -15,6 +15,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
 import { Comment } from '@prisma/client';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('Comment')
 @Controller('comment')
@@ -56,6 +57,7 @@ export class CommentController {
     return this.commentService.create(dto);
   }
 
+  @Roles('admin')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDoc({
