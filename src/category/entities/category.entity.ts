@@ -1,6 +1,4 @@
-import { ICategory } from '../../common/interfaces/category.interface';
-
-export class Category implements ICategory {
+export class Category {
   id: string;
   name: string;
   description: string;

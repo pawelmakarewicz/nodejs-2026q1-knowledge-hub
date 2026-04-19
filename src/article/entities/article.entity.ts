@@ -1,13 +1,10 @@
-import { IArticle } from '../../common/interfaces/article.interface';
-
-export class Article implements IArticle {
+export class Article {
   id: string;
   title: string;
   content: string;
-  status: 'draft' | 'published' | 'archived';
+  status: string;
   authorId: string | null;
   categoryId: string | null;
-  tags: string[];
-  createdAt: number;
-  updatedAt: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

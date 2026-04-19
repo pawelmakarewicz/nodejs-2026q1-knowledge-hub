@@ -6,7 +6,7 @@ import {
   IsArray,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { ArticleStatus } from '../../common/enums/article-status.enum';
+import { ArticleStatus } from '@prisma/client';
 
 export class UpdateArticleDto {
   @ApiPropertyOptional({ example: 'Updated Title' })
@@ -21,7 +21,7 @@ export class UpdateArticleDto {
   @IsNotEmpty()
   content?: string;
 
-  @ApiPropertyOptional({ enum: ArticleStatus, example: 'published' })
+  @ApiPropertyOptional({ enum: ArticleStatus, example: 'PUBLISHED' })
   @IsOptional()
   @IsEnum(ArticleStatus)
   status?: ArticleStatus;

@@ -1,5 +1,15 @@
 # Knowledge Hub
 
+## Docker
+
+- Docker Hub image: https://hub.docker.com/r/pawelmakarewicz/nodejs-2026q1-knowledge-hub
+- Detailed Docker report: [docker-containerization-report.md](./docker-containerization-report.md)
+
+```bash
+docker pull pawelmakarewicz/nodejs-2026q1-knowledge-hub:latest
+docker-compose up --build
+```
+
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).

@@ -10,12 +10,13 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
-import { Article } from './entities/article.entity';
+import { Article } from '@prisma/client';
+import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
 
 @ApiTags('Article')
 @Controller('article')
@@ -23,55 +24,62 @@ export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all articles with optional filters' })
+  @ApiDoc({
+    summary: 'Get all articles with optional filters',
+    responses: [{ status: 200, description: 'List of articles' }],
+  })
   @ApiQuery({ name: 'status', required: false })
   @ApiQuery({ name: 'categoryId', required: false })
   @ApiQuery({ name: 'tag', required: false })
-  @ApiResponse({ status: 200, description: 'List of articles' })
   findAll(
     @Query('status') status?: string,
     @Query('categoryId') categoryId?: string,
     @Query('tag') tag?: string,
-  ): Article[] {
+  ): Promise<Article[]> {
     return this.articleService.findAll({ status, categoryId, tag });
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get article by id' })
-  @ApiResponse({ status: 200, description: 'Article found' })
-  @ApiResponse({ status: 400, description: 'Invalid UUID' })
-  @ApiResponse({ status: 404, description: 'Article not found' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Article {
+  @ApiDoc({
+    summary: 'Get article by id',
+    responses: [{ status: 200, description: 'Article found' }, ...UUID_ERRORS],
+  })
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Article> {
     return this.articleService.findOne(id);
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new article' })
-  @ApiResponse({ status: 201, description: 'Article created' })
-  @ApiResponse({ status: 400, description: 'Invalid input data' })
-  create(@Body() dto: CreateArticleDto): Article {
+  @ApiDoc({
+    summary: 'Create a new article',
+    responses: [{ status: 201, description: 'Article created' }, ...INVALID_INPUT],
+  })
+  create(@Body() dto: CreateArticleDto): Promise<Article> {
     return this.articleService.create(dto);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update an article' })
-  @ApiResponse({ status: 200, description: 'Article updated' })
-  @ApiResponse({ status: 400, description: 'Invalid UUID or input data' })
-  @ApiResponse({ status: 404, description: 'Article not found' })
+  @ApiDoc({
+    summary: 'Update an article',
+    responses: [
+      { status: 200, description: 'Article updated' },
+      { status: 400, description: 'Invalid UUID or input data' },
+      { status: 404, description: 'Article not found' },
+    ],
+  })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateArticleDto,
-  ): Article {
+  ): Promise<Article> {
     return this.articleService.update(id, dto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete an article' })
-  @ApiResponse({ status: 204, description: 'Article deleted' })
-  @ApiResponse({ status: 400, description: 'Invalid UUID' })
-  @ApiResponse({ status: 404, description: 'Article not found' })
-  remove(@Param('id', ParseUUIDPipe) id: string): void {
+  @ApiDoc({
+    summary: 'Delete an article',
+    responses: [{ status: 204, description: 'Article deleted' }, ...UUID_ERRORS],
+  })
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.articleService.remove(id);
   }
 }
