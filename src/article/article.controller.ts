@@ -52,7 +52,10 @@ export class ArticleController {
   @Post()
   @ApiDoc({
     summary: 'Create a new article',
-    responses: [{ status: 201, description: 'Article created' }, ...INVALID_INPUT],
+    responses: [
+      { status: 201, description: 'Article created' },
+      ...INVALID_INPUT,
+    ],
   })
   create(@Body() dto: CreateArticleDto): Promise<Article> {
     return this.articleService.create(dto);
@@ -79,7 +82,10 @@ export class ArticleController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDoc({
     summary: 'Delete an article',
-    responses: [{ status: 204, description: 'Article deleted' }, ...UUID_ERRORS],
+    responses: [
+      { status: 204, description: 'Article deleted' },
+      ...UUID_ERRORS,
+    ],
   })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.articleService.remove(id);
