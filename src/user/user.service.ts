@@ -1,14 +1,14 @@
 import {
   Injectable,
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotFoundError } from '../common/errors/not-found.error';
+import { ForbiddenError } from '../common/errors/forbidden.error';
+import { ValidationError } from '../common/errors/validation.error';
 
 @Injectable()
 export class UserService {
@@ -36,7 +36,7 @@ export class UserService {
       select: this.userWithoutPassword(),
     });
     if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundError(`User with id ${id} not found`);
     }
     return user;
   }
@@ -50,7 +50,7 @@ export class UserService {
       where: { login: dto.login },
     });
     if (existing) {
-      throw new BadRequestException(`Login "${dto.login}" is already taken`);
+      throw new ValidationError(`Login "${dto.login}" is already taken`);
     }
 
     const salt = parseInt(process.env.CRYPT_SALT ?? '10', 10);
@@ -72,7 +72,7 @@ export class UserService {
   ): Promise<Omit<User, 'password'>> {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundError(`User with id ${id} not found`);
     }
 
     const data: Record<string, unknown> = {};
@@ -80,7 +80,7 @@ export class UserService {
     if (dto.oldPassword && dto.newPassword) {
       const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
       if (!isMatch) {
-        throw new ForbiddenException('Old password is incorrect');
+        throw new ForbiddenError('Old password is incorrect');
       }
       const salt = parseInt(process.env.CRYPT_SALT ?? '10', 10);
       data.password = await bcrypt.hash(dto.newPassword, salt);
@@ -100,7 +100,7 @@ export class UserService {
   async remove(id: string): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundError(`User with id ${id} not found`);
     }
     await this.prisma.$transaction([
       this.prisma.article.updateMany({

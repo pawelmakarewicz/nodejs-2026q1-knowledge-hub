@@ -1,12 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Article, ArticleStatus } from '@prisma/client';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { ValidationError } from '../common/errors/validation.error';
+import { NotFoundError } from '../common/errors/not-found.error';
 
 @Injectable()
 export class ArticleService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private isStatusTransitionAllowed(
+    current: ArticleStatus,
+    next: ArticleStatus,
+  ): boolean {
+    if (current === next) return true;
+
+    return (
+      (current === ArticleStatus.DRAFT && next === ArticleStatus.PUBLISHED) ||
+      (current === ArticleStatus.PUBLISHED && next === ArticleStatus.ARCHIVED)
+    );
+  }
 
   async findAll(filters?: {
     status?: string;
@@ -37,7 +51,7 @@ export class ArticleService {
       include: { tags: true },
     });
     if (!article) {
-      throw new NotFoundException(`Article with id ${id} not found`);
+      throw new NotFoundError(`Article with id ${id} not found`);
     }
     return article;
   }
@@ -69,7 +83,16 @@ export class ArticleService {
   }
 
   async update(id: string, dto: UpdateArticleDto): Promise<Article> {
-    await this.findOne(id);
+    const existing = await this.findOne(id);
+
+    if (
+      dto.status !== undefined &&
+      !this.isStatusTransitionAllowed(existing.status, dto.status)
+    ) {
+      throw new ValidationError(
+        `Invalid status transition: ${existing.status} -> ${dto.status}`,
+      );
+    }
 
     const data: any = {};
     if (dto.title !== undefined) data.title = dto.title;
