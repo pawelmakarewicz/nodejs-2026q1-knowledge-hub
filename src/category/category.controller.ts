@@ -16,6 +16,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
 import { Category } from '@prisma/client';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('Category')
 @Controller('category')
@@ -40,6 +41,7 @@ export class CategoryController {
     return this.categoryService.findOne(id);
   }
 
+  @Roles('admin')
   @Post()
   @ApiDoc({
     summary: 'Create a new category',
@@ -52,6 +54,7 @@ export class CategoryController {
     return this.categoryService.create(dto);
   }
 
+  @Roles('admin')
   @Put(':id')
   @ApiDoc({
     summary: 'Update a category',
@@ -68,6 +71,7 @@ export class CategoryController {
     return this.categoryService.update(id, dto);
   }
 
+  @Roles('admin')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDoc({

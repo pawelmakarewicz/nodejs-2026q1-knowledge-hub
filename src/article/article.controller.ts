@@ -17,6 +17,7 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
 import { Article } from '@prisma/client';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('Article')
 @Controller('article')
@@ -51,7 +52,10 @@ export class ArticleController {
   @Post()
   @ApiDoc({
     summary: 'Create a new article',
-    responses: [{ status: 201, description: 'Article created' }, ...INVALID_INPUT],
+    responses: [
+      { status: 201, description: 'Article created' },
+      ...INVALID_INPUT,
+    ],
   })
   create(@Body() dto: CreateArticleDto): Promise<Article> {
     return this.articleService.create(dto);
@@ -73,11 +77,15 @@ export class ArticleController {
     return this.articleService.update(id, dto);
   }
 
+  @Roles('admin')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDoc({
     summary: 'Delete an article',
-    responses: [{ status: 204, description: 'Article deleted' }, ...UUID_ERRORS],
+    responses: [
+      { status: 204, description: 'Article deleted' },
+      ...UUID_ERRORS,
+    ],
   })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.articleService.remove(id);

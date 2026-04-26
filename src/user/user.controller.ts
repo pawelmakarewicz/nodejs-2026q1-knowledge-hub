@@ -15,6 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ParseUUIDPipe } from '../common/pipes/parse-uuid.pipe';
 import { ApiDoc, UUID_ERRORS, INVALID_INPUT } from '../common/decorators';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('User')
 @Controller('user')
@@ -39,6 +40,7 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @Roles('admin')
   @Post()
   @ApiDoc({
     summary: 'Create a new user',
@@ -48,23 +50,25 @@ export class UserController {
     return this.userService.create(dto);
   }
 
+  @Roles('admin')
   @Put(':id')
   @ApiDoc({
-    summary: 'Update user password',
+    summary: 'Update user password or role',
     responses: [
-      { status: 200, description: 'Password updated' },
+      { status: 200, description: 'User updated' },
       { status: 400, description: 'Invalid UUID or input data' },
       { status: 403, description: 'Old password is incorrect' },
       { status: 404, description: 'User not found' },
     ],
   })
-  updatePassword(
+  updateUser(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdatePasswordDto,
+    @Body() dto: UpdatePasswordDto & { role?: string },
   ) {
-    return this.userService.updatePassword(id, dto);
+    return this.userService.updateUser(id, dto);
   }
 
+  @Roles('admin')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDoc({
