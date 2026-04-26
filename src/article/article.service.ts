@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Article, ArticleStatus } from '@prisma/client';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
@@ -7,6 +7,18 @@ import { PrismaService } from '../prisma/prisma.service';
 @Injectable()
 export class ArticleService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private isStatusTransitionAllowed(
+    current: ArticleStatus,
+    next: ArticleStatus,
+  ): boolean {
+    if (current === next) return true;
+
+    return (
+      (current === ArticleStatus.DRAFT && next === ArticleStatus.PUBLISHED) ||
+      (current === ArticleStatus.PUBLISHED && next === ArticleStatus.ARCHIVED)
+    );
+  }
 
   async findAll(filters?: {
     status?: string;
@@ -69,7 +81,16 @@ export class ArticleService {
   }
 
   async update(id: string, dto: UpdateArticleDto): Promise<Article> {
-    await this.findOne(id);
+    const existing = await this.findOne(id);
+
+    if (
+      dto.status !== undefined &&
+      !this.isStatusTransitionAllowed(existing.status, dto.status)
+    ) {
+      throw new BadRequestException(
+        `Invalid status transition: ${existing.status} -> ${dto.status}`,
+      );
+    }
 
     const data: any = {};
     if (dto.title !== undefined) data.title = dto.title;
