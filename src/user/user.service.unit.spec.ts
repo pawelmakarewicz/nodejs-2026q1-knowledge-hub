@@ -1,14 +1,13 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from '@prisma/client';
+import { vi } from 'vitest';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from './user.service';
 import { createPrismaMock } from '../../test/unit/mocks/prisma.mock';
+import { ValidationError } from '../common/errors/validation.error';
+import { ForbiddenError } from '../common/errors/forbidden.error';
+import { NotFoundError } from '../common/errors/not-found.error';
 
 vi.mock('bcrypt', () => ({
   hash: vi.fn(),
@@ -57,7 +56,7 @@ describe('UserService', () => {
   it('findOne throws when user is missing', async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
 
-    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('create throws for duplicate login', async () => {
@@ -65,7 +64,7 @@ describe('UserService', () => {
 
     await expect(
       service.create({ login: 'duplicate', password: 'pass' }),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    ).rejects.toBeInstanceOf(ValidationError);
   });
 
   it('create hashes password and keeps role', async () => {
@@ -103,7 +102,7 @@ describe('UserService', () => {
         oldPassword: 'old',
         newPassword: 'new',
       }),
-    ).rejects.toBeInstanceOf(NotFoundException);
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('updateUser throws when old password is invalid', async () => {
@@ -118,7 +117,7 @@ describe('UserService', () => {
         oldPassword: 'wrong',
         newPassword: 'new',
       }),
-    ).rejects.toBeInstanceOf(ForbiddenException);
+    ).rejects.toBeInstanceOf(ForbiddenError);
   });
 
   it('updateUser hashes new password and normalizes role', async () => {
@@ -149,7 +148,7 @@ describe('UserService', () => {
   it('remove throws for missing user', async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
 
-    await expect(service.remove('missing')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.remove('missing')).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('remove uses transaction for existing user', async () => {

@@ -1,8 +1,9 @@
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { UnprocessableEntityException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { createPrismaMock } from '../../test/unit/mocks/prisma.mock';
 import { CommentService } from './comment.service';
+import { NotFoundError } from '../common/errors/not-found.error';
 
 describe('CommentService', () => {
   let service: CommentService;
@@ -31,7 +32,7 @@ describe('CommentService', () => {
   it('findOne throws when comment does not exist', async () => {
     prismaMock.comment.findUnique.mockResolvedValueOnce(null);
 
-    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('create throws when article is missing', async () => {

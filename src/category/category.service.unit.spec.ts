@@ -1,8 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { createPrismaMock } from '../../test/unit/mocks/prisma.mock';
 import { CategoryService } from './category.service';
+import { NotFoundError } from '../common/errors/not-found.error';
 
 describe('CategoryService', () => {
   let service: CategoryService;
@@ -31,7 +31,7 @@ describe('CategoryService', () => {
   it('findOne throws for missing category', async () => {
     prismaMock.category.findUnique.mockResolvedValueOnce(null);
 
-    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('create passes dto fields to prisma', async () => {

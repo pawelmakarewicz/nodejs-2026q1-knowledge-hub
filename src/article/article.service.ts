@@ -1,8 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Article, ArticleStatus } from '@prisma/client';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { ValidationError } from '../common/errors/validation.error';
+import { NotFoundError } from '../common/errors/not-found.error';
 
 @Injectable()
 export class ArticleService {
@@ -49,7 +51,7 @@ export class ArticleService {
       include: { tags: true },
     });
     if (!article) {
-      throw new NotFoundException(`Article with id ${id} not found`);
+      throw new NotFoundError(`Article with id ${id} not found`);
     }
     return article;
   }
@@ -87,7 +89,7 @@ export class ArticleService {
       dto.status !== undefined &&
       !this.isStatusTransitionAllowed(existing.status, dto.status)
     ) {
-      throw new BadRequestException(
+      throw new ValidationError(
         `Invalid status transition: ${existing.status} -> ${dto.status}`,
       );
     }

@@ -1,9 +1,10 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ArticleStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { createPrismaMock } from '../../test/unit/mocks/prisma.mock';
 import { ArticleService } from './article.service';
+import { NotFoundError } from '../common/errors/not-found.error';
+import { ValidationError } from '../common/errors/validation.error';
 
 describe('ArticleService', () => {
   let service: ArticleService;
@@ -48,7 +49,7 @@ describe('ArticleService', () => {
   it('findOne throws when article does not exist', async () => {
     prismaMock.article.findUnique.mockResolvedValueOnce(null);
 
-    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('exists returns false/true based on lookup result', async () => {
@@ -112,7 +113,7 @@ describe('ArticleService', () => {
 
     await expect(
       service.update('a1', { status: ArticleStatus.PUBLISHED }),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    ).rejects.toBeInstanceOf(ValidationError);
   });
 
   it('updates tags with full replacement when dto.tags is provided', async () => {

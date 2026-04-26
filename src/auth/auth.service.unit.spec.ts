@@ -1,10 +1,11 @@
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
+import { ForbiddenError } from '../common/errors/forbidden.error';
+import { UnauthorizedError } from '../common/errors/unauthorized.error';
 
 vi.mock('bcrypt', () => ({
   hash: vi.fn(),
@@ -54,7 +55,7 @@ describe('AuthService', () => {
     userServiceMock.findByLogin.mockResolvedValueOnce(null);
 
     await expect(service.login({ login: 'john', password: 'pwd' })).rejects.toBeInstanceOf(
-      ForbiddenException,
+      ForbiddenError,
     );
   });
 
@@ -68,7 +69,7 @@ describe('AuthService', () => {
     vi.mocked(bcrypt.compare).mockResolvedValueOnce(false as never);
 
     await expect(service.login({ login: 'john', password: 'wrong' })).rejects.toBeInstanceOf(
-      ForbiddenException,
+      ForbiddenError,
     );
   });
 
@@ -93,7 +94,7 @@ describe('AuthService', () => {
   });
 
   it('refresh throws for missing token', async () => {
-    await expect(service.refresh('')).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(service.refresh('')).rejects.toBeInstanceOf(UnauthorizedError);
   });
 
   it('refresh rotates both tokens', async () => {
@@ -119,6 +120,6 @@ describe('AuthService', () => {
       throw new Error('jwt malformed');
     });
 
-    await expect(service.refresh('broken')).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(service.refresh('broken')).rejects.toBeInstanceOf(ForbiddenError);
   });
 });

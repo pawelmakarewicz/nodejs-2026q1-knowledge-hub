@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Category } from '@prisma/client';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotFoundError } from '../common/errors/not-found.error';
 
 @Injectable()
 export class CategoryService {
@@ -15,7 +16,7 @@ export class CategoryService {
   async findOne(id: string): Promise<Category> {
     const category = await this.prisma.category.findUnique({ where: { id } });
     if (!category) {
-      throw new NotFoundException(`Category with id ${id} not found`);
+      throw new NotFoundError(`Category with id ${id} not found`);
     }
     return category;
   }
