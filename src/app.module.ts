@@ -12,9 +12,11 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
+    LoggerModule,
     PrismaModule,
     JwtModule.register({}),
     UserModule,

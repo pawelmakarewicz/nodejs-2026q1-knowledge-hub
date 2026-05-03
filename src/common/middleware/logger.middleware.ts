@@ -1,17 +1,41 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { AppLoggerService } from '../logger/app-logger.service';
+import { sanitizeLogData } from '../logger/sanitize-log-data';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  private logger = new Logger('HTTP');
+  constructor(private readonly logger: AppLoggerService) {}
 
   use(req: Request, res: Response, next: NextFunction): void {
-    const { method, originalUrl } = req;
-    const timestamp = new Date().toISOString();
+    const { method, originalUrl, query, body } = req;
+    const startedAt = process.hrtime.bigint();
+
+    this.logger.log(
+      {
+        event: 'incoming_request',
+        method,
+        url: originalUrl,
+        query: sanitizeLogData(query),
+        body: sanitizeLogData(body),
+      },
+      'HTTP',
+    );
 
     res.on('finish', () => {
       const { statusCode } = res;
-      this.logger.log(`${timestamp} ${method} ${originalUrl} ${statusCode}`);
+      const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
+
+      this.logger.log(
+        {
+          event: 'outgoing_response',
+          method,
+          url: originalUrl,
+          statusCode,
+          responseTimeMs: Number(durationMs.toFixed(2)),
+        },
+        'HTTP',
+      );
     });
 
     next();
